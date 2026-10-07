@@ -1,0 +1,7 @@
+@"
+__pycache__/
+*.pyc
+.venv/
+venv/
+users.db
+"@ | Set-Content .gitignore
