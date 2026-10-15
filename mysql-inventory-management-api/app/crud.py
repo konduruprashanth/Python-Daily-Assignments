@@ -1,3 +1,4 @@
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -64,8 +65,17 @@ def create_supplier(db: Session, supplier: schemas.SupplierCreate):
     return db_supplier
 
 
-def get_suppliers(db: Session):
-    return db.query(models.Supplier).all()
+def get_suppliers(db: Session, active_only: bool = False):
+    query = db.query(models.Supplier)
+
+    if active_only:
+        query = query.filter(models.Supplier.is_active.is_(True))
+
+    return query.all()
+
+
+def get_active_suppliers(db: Session):
+    return get_suppliers(db, active_only=True)
 
 
 def get_supplier(db: Session, supplier_id: int):
@@ -111,7 +121,13 @@ def delete_supplier(db: Session, supplier_id: int):
 def create_product(db: Session, product: schemas.ProductCreate):
     db_product = models.Product(**product.model_dump())
     db.add(db_product)
-    db.commit()
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise
+
     db.refresh(db_product)
     return db_product
 
@@ -120,10 +136,22 @@ def get_products(db: Session):
     return db.query(models.Product).all()
 
 
+def get_products_to_restock(db: Session):
+    return (
+        db.query(models.Product)
+        .filter(models.Product.quantity <= models.Product.reorder_level)
+        .all()
+    )
+
+
 def get_product(db: Session, product_id: int):
     return (
         db.query(models.Product).filter(models.Product.product_id == product_id).first()
     )
+
+
+def get_product_by_sku(db: Session, sku: str):
+    return db.query(models.Product).filter(models.Product.sku == sku).first()
 
 
 def update_product(
@@ -141,7 +169,12 @@ def update_product(
     for key, value in update_data.items():
         setattr(db_product, key, value)
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise
+
     db.refresh(db_product)
     return db_product
 

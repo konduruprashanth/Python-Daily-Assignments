@@ -125,8 +125,19 @@ def create_supplier(
 
 
 @app.get("/suppliers", response_model=list[schemas.SupplierResponse])
-def read_suppliers(db: Session = Depends(get_db)):
-    return crud.get_suppliers(db)
+def read_suppliers(
+    active_only: bool = False,
+    db: Session = Depends(get_db),
+):
+    return crud.get_suppliers(db, active_only=active_only)
+
+
+@app.get(
+    "/suppliers/active",
+    response_model=list[schemas.SupplierResponse],
+)
+def read_active_suppliers(db: Session = Depends(get_db)):
+    return crud.get_active_suppliers(db)
 
 
 @app.get(
@@ -210,6 +221,14 @@ def create_product(
 @app.get("/products", response_model=list[schemas.ProductResponse])
 def read_products(db: Session = Depends(get_db)):
     return crud.get_products(db)
+
+
+@app.get(
+    "/products/restock",
+    response_model=list[schemas.ProductResponse],
+)
+def read_products_to_restock(db: Session = Depends(get_db)):
+    return crud.get_products_to_restock(db)
 
 
 @app.get(
