@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -15,9 +15,10 @@ router = APIRouter(prefix="/products", tags=["Products"])
 )
 def create_product(
     product: ProductCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
-    return product_service.create_product(db, product)
+    return product_service.create_product(db, product, background_tasks)
 
 
 @router.get("", response_model=list[ProductResponse])
@@ -42,9 +43,10 @@ def read_product(
 def update_product(
     product_id: int,
     product: ProductUpdate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
-    return product_service.update_product(db, product_id, product)
+    return product_service.update_product(db, product_id, product, background_tasks)
 
 
 @router.delete(

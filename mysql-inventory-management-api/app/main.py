@@ -9,10 +9,7 @@ from app.routers import (
 
 app = FastAPI(
     title="Inventory Management API",
-    description=(
-        "Manage products, categories, suppliers, "
-        "and file uploads."
-    ),
+    description=("Manage products, categories, suppliers, and file uploads."),
     version="1.1.0",
 )
 

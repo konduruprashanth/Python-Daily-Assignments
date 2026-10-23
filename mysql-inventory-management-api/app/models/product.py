@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     ForeignKey,
     Integer,
@@ -22,12 +23,8 @@ if TYPE_CHECKING:
 class Product(Base):
     __tablename__ = "products"
 
-    product_id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, index=True
-    )
-    product_name: Mapped[str] = mapped_column(
-        String(150), nullable=False, index=True
-    )
+    product_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    product_name: Mapped[str] = mapped_column(String(150), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     category_id: Mapped[int] = mapped_column(
@@ -44,11 +41,16 @@ class Product(Base):
     price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    sku: Mapped[str] = mapped_column(
-        String(50), unique=True, nullable=False
-    )
+    sku: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     reorder_level: Mapped[int] = mapped_column(
         Integer, nullable=False, default=10, server_default="10"
+    )
+
+    low_stock_alert_sent: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default="0",
+        nullable=False,
     )
 
     updated_at: Mapped[datetime] = mapped_column(

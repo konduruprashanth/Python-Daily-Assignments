@@ -18,15 +18,11 @@ class ProductCreate(ORMBase):
 
 
 class ProductUpdate(ORMBase):
-    product_name: str | None = Field(
-        default=None, min_length=1, max_length=150
-    )
+    product_name: str | None = Field(default=None, min_length=1, max_length=150)
     description: str | None = None
     category_id: int | None = Field(default=None, gt=0)
     supplier_id: int | None = Field(default=None, gt=0)
-    price: Decimal | None = Field(
-        default=None, gt=0, max_digits=10, decimal_places=2
-    )
+    price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
     quantity: int | None = Field(default=None, ge=0)
     sku: str | None = Field(default=None, min_length=1, max_length=50)
     reorder_level: int | None = Field(default=None, ge=0)

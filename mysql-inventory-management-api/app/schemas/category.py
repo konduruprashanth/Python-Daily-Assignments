@@ -13,9 +13,7 @@ class CategoryCreate(BaseModel):
 
 
 class CategoryUpdate(BaseModel):
-    category_name: str | None = Field(
-        default=None, min_length=1, max_length=100
-    )
+    category_name: str | None = Field(default=None, min_length=1, max_length=100)
     description: str | None = None
 
 

@@ -13,9 +13,7 @@ if TYPE_CHECKING:
 class Category(Base):
     __tablename__ = "categories"
 
-    category_id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, index=True
-    )
+    category_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     category_name: Mapped[str] = mapped_column(
         String(100), unique=True, nullable=False, index=True
     )
@@ -24,6 +22,4 @@ class Category(Base):
         DateTime, server_default=func.now(), nullable=False
     )
 
-    products: Mapped[list["Product"]] = relationship(
-        back_populates="category"
-    )
+    products: Mapped[list["Product"]] = relationship(back_populates="category")

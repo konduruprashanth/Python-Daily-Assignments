@@ -24,19 +24,11 @@ def get_products(db: Session):
 
 
 def get_products_to_restock(db: Session):
-    return (
-        db.query(Product)
-        .filter(Product.quantity <= Product.reorder_level)
-        .all()
-    )
+    return db.query(Product).filter(Product.quantity <= Product.reorder_level).all()
 
 
 def get_product(db: Session, product_id: int):
-    return (
-        db.query(Product)
-        .filter(Product.product_id == product_id)
-        .first()
-    )
+    return db.query(Product).filter(Product.product_id == product_id).first()
 
 
 def get_product_by_sku(db: Session, sku: str):

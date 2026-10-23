@@ -12,19 +12,11 @@ def create_file_metadata(db: Session, file_data: dict):
 
 
 def get_files(db: Session):
-    return (
-        db.query(FileMetadata)
-        .order_by(FileMetadata.uploaded_at.desc())
-        .all()
-    )
+    return db.query(FileMetadata).order_by(FileMetadata.uploaded_at.desc()).all()
 
 
 def get_file(db: Session, file_id: int):
-    return (
-        db.query(FileMetadata)
-        .filter(FileMetadata.id == file_id)
-        .first()
-    )
+    return db.query(FileMetadata).filter(FileMetadata.id == file_id).first()
 
 
 def delete_file_metadata(db: Session, db_file: FileMetadata):

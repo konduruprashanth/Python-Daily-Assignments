@@ -26,11 +26,7 @@ def get_active_suppliers(db: Session):
 
 
 def get_supplier(db: Session, supplier_id: int):
-    return (
-        db.query(Supplier)
-        .filter(Supplier.supplier_id == supplier_id)
-        .first()
-    )
+    return db.query(Supplier).filter(Supplier.supplier_id == supplier_id).first()
 
 
 def update_supplier(

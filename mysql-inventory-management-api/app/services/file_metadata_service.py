@@ -1,4 +1,3 @@
-import os
 import uuid
 from pathlib import Path
 
@@ -8,9 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.repositories.file_metadata_repository import (
     create_file_metadata,
+    delete_file_metadata,
     get_file,
     get_files,
-    delete_file_metadata,
 )
 
 UPLOAD_DIR = Path("uploads").resolve()

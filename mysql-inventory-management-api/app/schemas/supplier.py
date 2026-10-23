@@ -16,9 +16,7 @@ class SupplierCreate(ORMBase):
 
 
 class SupplierUpdate(ORMBase):
-    supplier_name: str | None = Field(
-        default=None, min_length=1, max_length=150
-    )
+    supplier_name: str | None = Field(default=None, min_length=1, max_length=150)
     email: EmailStr | None = None
     phone_number: str | None = Field(default=None, max_length=20)
     phone: str | None = Field(default=None, max_length=20)
