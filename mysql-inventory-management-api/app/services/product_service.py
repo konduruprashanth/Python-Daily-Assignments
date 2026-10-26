@@ -70,8 +70,16 @@ def create_product(
     return db_product
 
 
-def get_products(db: Session):
-    return product_repository.get_products(db)
+def get_products(
+    db: Session,
+    page: int = 1,
+    page_size: int = 10,
+):
+    return product_repository.get_products(
+        db,
+        page=page,
+        page_size=page_size,
+    )
 
 
 def get_products_to_restock(db: Session):
@@ -101,7 +109,11 @@ def update_product(
     background_tasks: BackgroundTasks,
 ):
     try:
-        updated_product = product_repository.update_product(db, product_id, product)
+        updated_product = product_repository.update_product(
+            db,
+            product_id,
+            product,
+        )
     except IntegrityError:
         db.rollback()
         raise HTTPException(

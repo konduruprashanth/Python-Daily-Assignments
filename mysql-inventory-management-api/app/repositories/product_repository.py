@@ -19,12 +19,37 @@ def create_product(db: Session, product: ProductCreate):
     return db_product
 
 
-def get_products(db: Session):
-    return db.query(Product).all()
+def get_products(
+    db: Session,
+    page: int = 1,
+    page_size: int = 10,
+):
+    query = db.query(Product)
+
+    total = query.count()
+
+    products = (
+        query.order_by(Product.product_id)
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+
+    return {
+        "items": products,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": (total + page_size - 1) // page_size,
+    }
 
 
 def get_products_to_restock(db: Session):
-    return db.query(Product).filter(Product.quantity <= Product.reorder_level).all()
+    return (
+        db.query(Product)
+        .filter(Product.quantity <= Product.reorder_level)
+        .all()
+    )
 
 
 def get_product(db: Session, product_id: int):
