@@ -45,11 +45,7 @@ def get_products(
 
 
 def get_products_to_restock(db: Session):
-    return (
-        db.query(Product)
-        .filter(Product.quantity <= Product.reorder_level)
-        .all()
-    )
+    return db.query(Product).filter(Product.quantity <= Product.reorder_level).all()
 
 
 def get_product(db: Session, product_id: int):

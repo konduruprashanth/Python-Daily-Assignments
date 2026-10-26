@@ -99,8 +99,10 @@ async def upload_file(db: Session, file: UploadFile):
 
     except SQLAlchemyError as exc:
         db.rollback()
+
         if destination.exists():
             destination.unlink()
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Could not save file metadata.",
@@ -108,8 +110,10 @@ async def upload_file(db: Session, file: UploadFile):
 
     except OSError as exc:
         db.rollback()
+
         if destination.exists():
             destination.unlink()
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Could not store the uploaded file.",
@@ -137,17 +141,40 @@ def get_file_by_id(db: Session, file_id: int):
 
 def get_download_path(db: Session, file_id: int) -> Path:
     db_file = get_file_by_id(db, file_id)
-    file_path = Path(db_file.file_path)
 
-    if file_path.is_absolute() or ".." in file_path.parts:
+    stored_filename = db_file.stored_filename
+    stored_name = Path(stored_filename)
+
+    # Only allow a single filename, not a directory path.
+    if (
+        not stored_filename
+        or stored_name.name != stored_filename
+        or stored_filename in {".", ".."}
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid file path.",
         )
 
-    full_path = (Path.cwd() / file_path).resolve()
+    # Validate the saved relative path and ensure it refers to
+    # the same filename recorded in the metadata.
+    recorded_path = Path(db_file.file_path)
 
-    if not full_path.is_relative_to(UPLOAD_DIR):
+    if (
+        recorded_path.is_absolute()
+        or ".." in recorded_path.parts
+        or recorded_path.name != stored_filename
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file path.",
+        )
+
+    upload_root = UPLOAD_DIR.resolve()
+    full_path = (upload_root / stored_name).resolve()
+
+    # Prevent directory traversal outside the upload directory.
+    if full_path.parent != upload_root:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid file path.",
@@ -170,6 +197,7 @@ def remove_file(db: Session, file_id: int):
         delete_file_metadata(db, db_file)
     except SQLAlchemyError as exc:
         db.rollback()
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Could not delete file metadata.",
@@ -180,7 +208,7 @@ def remove_file(db: Session, file_id: int):
     except OSError as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Metadata was deleted, but the stored file could not be removed.",
+            detail=("Metadata was deleted, but the stored file could not be removed."),
         ) from exc
 
     return {"message": "File deleted successfully."}
